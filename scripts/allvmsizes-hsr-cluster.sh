@@ -128,14 +128,15 @@ echo "logicalvols start" >> /tmp/parameter.txt
   STRIPESIZE=64
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 70%FREE -n datalv datavg
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv datavg
-  mount -t xfs /dev/datavg/loglv /hana/log 
-  echo "/dev/mapper/datavg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
+
 
   mkfs.xfs /dev/datavg/datalv
   mkfs.xfs /dev/datavg/loglv
   mkfs -t xfs /dev/sharedvg/sharedlv 
   mkfs -t xfs /dev/backupvg/backuplv 
   mkfs -t xfs /dev/usrsapvg/usrsaplv
+  mount -t xfs /dev/datavg/loglv /hana/log 
+  echo "/dev/mapper/datavg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
 echo "logicalvols end" >> /tmp/parameter.txt
 fi
 
@@ -182,14 +183,15 @@ if [ $VMSIZE == "Standard_M64s" ]; then
   PHYSVOLUMES=2
   STRIPESIZE=32
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log 
-echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
+
 
   mkfs.xfs /dev/datavg/datalv
   mkfs.xfs /dev/logvg/loglv
   mkfs -t xfs /dev/sharedvg/sharedlv 
   mkfs -t xfs /dev/backupvg/backuplv 
   mkfs -t xfs /dev/usrsapvg/usrsaplv
+  mount -t xfs /dev/logvg/loglv /hana/log 
+  echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
 echo "logicalvols end" >> /tmp/parameter.txt
 fi
 
@@ -234,14 +236,15 @@ if [ $VMSIZE == "Standard_M64ms" ] || [ $VMSIZE == "Standard_M128s" ]; then
   PHYSVOLUMES=2
   STRIPESIZE=32
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log   
-echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
+
 
   mkfs.xfs /dev/datavg/datalv
   mkfs.xfs /dev/logvg/loglv
   mkfs -t xfs /dev/sharedvg/sharedlv 
   mkfs -t xfs /dev/backupvg/backuplv 
   mkfs -t xfs /dev/usrsapvg/usrsaplv
+  mount -t xfs /dev/logvg/loglv /hana/log   
+  echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
 echo "logicalvols end" >> /tmp/parameter.txt
 fi
 
@@ -290,14 +293,15 @@ if [ $VMSIZE == "Standard_M128ms" ]; then
   PHYSVOLUMES=2
   STRIPESIZE=32
   lvcreate -i$PHYSVOLUMES -I$STRIPESIZE -l 100%FREE -n loglv logvg
-  mount -t xfs /dev/logvg/loglv /hana/log 
-  echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
+
 
   mkfs.xfs /dev/datavg/datalv
   mkfs.xfs /dev/logvg/loglv
   mkfs -t xfs /dev/sharedvg/sharedlv 
   mkfs -t xfs /dev/backupvg/backuplv 
   mkfs -t xfs /dev/usrsapvg/usrsaplv
+  mount -t xfs /dev/logvg/loglv /hana/log 
+  echo "/dev/mapper/logvg-loglv /hana/log xfs defaults 0 0" >> /etc/fstab
 fi
 
 #!/bin/bash
