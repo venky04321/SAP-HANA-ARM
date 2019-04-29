@@ -20,6 +20,33 @@ if [ "$SUBEMAIL" != "" ]; then
   fi
 fi
 
+#decode hana version parameter
+HANAVER=${HANAVER^^}
+if [ "${HANAVER}" = "SAP HANA PLATFORM EDITION 2.0 SPS01 REV 10 (51052030)" ]
+then
+  hanapackage="51052030"
+else
+  echo "not 51052030"
+  if [ "$HANAVER" = "SAP HANA PLATFORM EDITION 2.0 SPS02 (51052325)" ]
+  then
+    hanapackage="51052325"
+  else
+  echo "not 51052325"
+    if [ "$HANAVER" = "SAP HANA PLATFORM EDITION 2.0 SPS03 REV30 (51053061)" ]
+    then
+      hanapackage="51053061"
+    else
+      if [ "$HANAVER" = "SAP HANA PLATFORM EDITION 2.0 SPS04 REV40 (51053787)" ]
+      then
+        hanapackage="51053787"
+      else
+        echo "not 51053061, default to 51052325"
+        hanapackage="51052325"
+      fi
+    fi
+  fi
+fi
+
 #get the VM size via the instance api
 VMSIZE=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/vmSize?api-version=2017-08-01&format=text"`
 
@@ -304,25 +331,46 @@ else
 fi
 
 
+#####################
+SAPBITSDIR="/hana/data/sapbits"
+
+if [ "${hanapackage}" = "51053787" ]
+then 
+  /usr/bin/wget --quiet $Uri/SapBits/${hanapackage}.ZIP
+  cd $SAPBITSDIR
+  mkdir ${hanapackage}
+  cd ${hanapackage}
+  unzip ../${hanapackage}.ZIP
+  cd $SAPBITSDIR
+  #add additional requirement
+  zypper install -y libatomic1
+else
+  /usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part1.exe
+  /usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part2.rar
+  /usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part3.rar
+  /usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part4.rar
+  cd $SAPBITSDIR
+
+  echo "hana unrar start" >> /tmp/parameter.txt
+  #!/bin/bash
+  cd $SAPBITSDIR
+  unrar  -o- x ${hanapackage}_part1.exe
+  echo "hana unrar end" >> /tmp/parameter.txt
+
+fi
+#####################
+
+
+
 #!/bin/bash
 cd /hana/data/sapbits
 echo "hana download start" >> /tmp/parameter.txt
 /usr/bin/wget --quiet $Uri/SapBits/md5sums
-/usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part1.exe
-/usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part2.rar
-/usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part3.rar
-/usr/bin/wget --quiet $Uri/SapBits/${hanapackage}_part4.rar
 /usr/bin/wget --quiet "https://raw.githubusercontent.com/AzureCAT-GSI/SAP-HANA-ARM/master/hdbinst.cfg"
 echo "hana download end" >> /tmp/parameter.txt
 
 date >> /tmp/testdate
 cd /hana/data/sapbits
-
-echo "hana unrar start" >> /tmp/parameter.txt
-#!/bin/bash
-cd /hana/data/sapbits
-unrar x ${hanapackage}_part1.exe
-echo "hana unrar end" >> /tmp/parameter.txt
 
 echo "hana prepare start" >> /tmp/parameter.txt
 cd /hana/data/sapbits
